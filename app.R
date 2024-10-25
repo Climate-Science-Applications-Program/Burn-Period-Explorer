@@ -87,15 +87,17 @@ ui <- fluidPage(
              sidebarLayout(
                sidebarPanel(
                  selectizeInput("selected_location", 
-                                "Choose a location:", 
+                                "Choose a location and then click Download Data:", 
                                 choices = locations$name,
                                 options = list(placeholder = 'Type or select a location')),
                  br(),
                  actionButton("execute_btn", "Download Data"),  # <-- New: Add action button
-                 br()
+                 br(),
+                 br(),
+                 p("(Downloading large dataset: This will take several minutes.)")
                ),
                mainPanel(
-                 leafletOutput("map", width = "100%", height = "700px")
+                 leafletOutput("map", width = "100%", height = "500px")
                )
              )
     ),
@@ -125,6 +127,7 @@ ui <- fluidPage(
                ),
                mainPanel(
                  plotlyOutput("plot"),
+                 p("Climatology represents daily smoothed mean (dark grey line) and range of values between 5th and 95th percentiles (light grey bars)."),
                  br(),
                  plotlyOutput("plot3"),
                  br(),
@@ -137,28 +140,30 @@ ui <- fluidPage(
     tabPanel("About", 
              fluidRow(
                column(12, 
-                      h4("About the Explorer"),
+                      h5("About the Explorer"),
                       p("This app helps visualize and explore Burn Period (hours/day with relative humidity below threshold) values at weather stations across the U.S. By using hourly RAWS (Remote Automatic Weather Station) data, you can explore burn periods based on different relative humidity thresholds."),
-                      h4("Data Source"),
+                      h5("Data Source"),
                       p("Data is downloaded from both the gap-filled RAWS data at DRI-CEFA (2000-2022, https://cefa.dri.edu/raws/) and WIMS (2023-present, https://www.wildfire.gov/application/wims), which provides a long and complete period of record to allow for climatological analyses of Burn Period values."),
-                      h4("How to Use the App"),
+                      h5("How to Use the App"),
                       tags$ul(
                         tags$li(tags$b("Interactive Map"), ": Use the interactive map to explore different station locations. Click on a station or use the dropdown list to select a specific site."),
                         tags$li(tags$b("Downloading Data"), ": After selecting a station, click \"Download Data\" to fetch the historical data for the selected station. This will take several minutes."),
                         tags$li(tags$b("Generating Plots"), ": In the 'Plots' tab, choose a year and relative humidity threshold to generate burn period time series plots. These plots help visualize the burn period and relative humidity trends for the selected location and year.")
                       ),
-                      h4("Features"),
+                      h5("Features"),
                       tags$ul(
                         tags$li(tags$b("Burn Period Analysis"), ": Generate burn period plots based on weather data from selected RAWS stations."),
                         tags$li(tags$b("Interactive Plots"), ": Created using Plotly, these plots allow you to zoom and explore data points in detail and download and save plots."),
                         tags$li(tags$b("Relative Humidity Threshold"), ": Adjust the relative humidity (RH) threshold to see its impact on burn periods.")
                       ),
-                      h4("Use Cases"),
+                      h5("Use Cases"),
                       p("This app can be used by wildfire managers, researchers, and decision-makers to assess Burn Periods across different regions. It is also helpful for assessing historical conditions and the evolution of fire seasons in past years."),
-                      h4("Acknowledgments"),
+                      h5("Acknowledgments"),
                       p("We acknowledge the Program for Climate, Ecosystem and Fire Applications at the Desert Research Institute for providing the gap-filled RAWS data critical in calculating Burn Period climatologies."),
-                      h4("Contact Information"),
-                      p("If you have questions or feedback, please contact Mike Crimmins (crimmins@arizona.edu).")
+                      h5("Contact Information"),
+                      p("If you have questions or feedback, please contact Mike Crimmins (crimmins@arizona.edu)."),
+                      h5("App Code"),
+                      tags$a(href='https://github.com/Climate-Science-Applications-Program/Burn-Period-Explorer', 'https://github.com/Climate-Science-Applications-Program/Burn-Period-Explorer')
                )
              )
     )
