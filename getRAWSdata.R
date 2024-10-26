@@ -24,7 +24,7 @@ get_RAWS_rh <- function(nwsID) {
   
   #####
   # get recent station from WIMs from 2023 to present 
-  url<-paste0("https://famprod.nwcg.gov/wims/xsql/obs.xsql?stn=",nwsID,"&sig=&user=&type=&start=01-Jan-2023","&end=31-Dec-",format(Sys.time(), "%Y"),"&time=&sort=&ndays=")
+  url<-paste0("https://famprod.nwcg.gov/prod-wims/xsql/obs.xsql?stn=",nwsID,"&sig=&user=&type=&start=01-Jan-2023","&end=31-Dec-",format(Sys.time(), "%Y"),"&time=&sort=&ndays=")
   #stnID<-substr(file_names[i], 4,9)
   #url<-paste0("https://famprod.nwcg.gov/wims/xsql/obs.xsql?stn=",nwsID,"&sig=&type=&start=&end=&time=&sort=asc&ndays=10&user=")
   # past year
