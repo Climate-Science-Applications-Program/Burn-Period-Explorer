@@ -45,17 +45,25 @@ spinner_css <- "
 "
 #####
 
-source("getRAWSdata.R")
+#source("getRAWSdata.R")
+source("getRAWSdata_FEMS.R")
 source("calcBP.R")
 source("generateBPplot.R")
 source("climoBPplots.R")
 
 # Load location data from the CSV file
-locations <- read.csv("RAWSfw13list-gapfilled.csv")
+#locations <- read.csv("RAWSfw13list-gapfilled.csv")
+# load the new station list from processMetaData.R
+locations <- read.csv("station_metadata_FEMS3_042225.csv")
+
+# OLD -- Rename columns for easier use
+#locations <- locations %>%
+#  rename(lat = LatDegrees, lng = LonDegrees, name = Name, elevation = Elevation)
 
 # Rename columns for easier use
 locations <- locations %>%
-  rename(lat = LatDegrees, lng = LonDegrees, name = Name, elevation = Elevation)
+  rename(lat = latitude, lng = longitude, name = station_name, elevation = elevation, StationID=station_id)
+
 
 # Define the UI
 ui <- fluidPage(
@@ -86,10 +94,17 @@ ui <- fluidPage(
     tabPanel("Map", 
              sidebarLayout(
                sidebarPanel(
-                 selectizeInput("selected_location", 
-                                "Choose a location and then click Download Data:", 
-                                choices = locations$name,
-                                options = list(placeholder = 'Type or select a location')),
+                 # selectizeInput("selected_location", 
+                 #                "Choose a location and then click Download Data:", 
+                 #                choices = locations$name,
+                 #                options = list(placeholder = 'Type or select a location')),
+                 selectizeInput(
+                   "selected_location", 
+                   "Choose a location and then click Download Data:", 
+                   choices = locations$name,
+                   selected = "SAGUARO",  # <-- Set your default station name here
+                   options = list(placeholder = 'Type or select a location')
+                 ),
                  br(),
                  actionButton("execute_btn", "Download Data"),  # <-- New: Add action button
                  br(),
@@ -108,7 +123,7 @@ ui <- fluidPage(
                sidebarPanel(
                  selectizeInput("selected_year", 
                                 "Choose a year:", 
-                                choices = seq(2000,as.numeric(format(Sys.Date(),"%Y")),1),
+                                choices = seq(2005,as.numeric(format(Sys.Date(),"%Y")),1),
                                 options = list(placeholder = 'Type or select a year'),
                                 selected = as.numeric(format(Sys.Date(),"%Y"))),
                  br(),
@@ -258,7 +273,9 @@ server <- function(input, output, session) {
     #withProgress(message = 'Downloading data...', value = NULL, {
     # run download script
     station_id <- selected_stationID()
-    rawsData<-get_RAWS_rh(station_id)
+    print(station_id)
+    #rawsData<-get_RAWS_rh(station_id) # for original getRAWSdata.R
+    rawsData<-get_RAWS_rh(station_id, locations) # for getRAWSdata_FEMS.R
     #})
     # Once the script completes, remove the initial modal
     removeModal()
@@ -308,12 +325,17 @@ server <- function(input, output, session) {
     # #####
     
     observe({
-      # monitor for changes in UI   
+      # monitor for changes in UI 
       selYr<-input$selected_year
       bpT<-input$bpThreshold
+      #print(paste("Selected Year:", selYr))
+      #print(paste("Selected RH Threshold:", bpT)) 
+      #print(tail(rawsData, 12))
       # generate the plots
-      bpData<-calc_bp(rawsData,bpT) # make threshold selection interactive
-      bpPlots<-make_BP_plots(bpData, selYr)
+      bpData<-calc_bp(rawsData,as.numeric(bpT)) # make threshold selection interactive
+        #print(tail(bpData[[1]],24))
+        #print(bpData[[3]])
+      bpPlots<-make_BP_plots(bpData, as.numeric(selYr))
       climPlots<-make_climo_plots(rawsData,bpData,as.numeric(bpT))
       
       # render BP plot

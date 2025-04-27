@@ -37,12 +37,12 @@ calc_bp<-function(rawsData,rhThresh){
   
   # calculate daily climatologies
   dayQuantiles<- burnHRS %>% group_by(doy) %>% summarize(
-    q05 = quantile(bp,0.05,na.rm='TRUE'),
-    q50 = quantile(bp,0.50,na.rm='TRUE'),
-    q95 = quantile(bp,0.95,na.rm='TRUE'),
-    min = min(bp,na.rm='TRUE'),
-    max = max(bp,na.rm='TRUE'),
-    avg = mean(bp,na.rm='TRUE'),
+    q05 = quantile(bp,0.05,na.rm=TRUE),
+    q50 = quantile(bp,0.50,na.rm=TRUE),
+    q95 = quantile(bp,0.95,na.rm=TRUE),
+    min = min(bp,na.rm=TRUE),
+    max = max(bp,na.rm=TRUE),
+    avg = mean(bp,na.rm=TRUE),
     n = n())
   
   # moving average
