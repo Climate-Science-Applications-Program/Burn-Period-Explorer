@@ -44,9 +44,14 @@ get_RAWS_rh <- function(stationID,
     filter(!is.na(date_time))
   
   # Merge with location metadata
+  # df <- df %>%
+  #   rename(station_id = station_id, date_time = date_time) %>%
+  #   left_join(locations_df, by = c("station_id" = "StationID"))
+  
+  # fix for change in FEMS csv colnames -- no station_id
   df <- df %>%
-    rename(station_id = station_id, date_time = date_time) %>%
-    left_join(locations_df, by = c("station_id" = "StationID"))
+    rename(date_time = date_time) %>%
+    left_join(locations_df, by = c("station_name" = "name"))
   
   # Convert date_time to local timezone based on metadata tz more efficiently
   df <- df %>%
@@ -70,8 +75,8 @@ get_RAWS_rh <- function(stationID,
   # Select and rename columns to match desired output
   df <- df %>%
     transmute(
-      sta_id = station_id,
-      sta_nm = name,
+      sta_id = StationID,
+      sta_nm = station_name,
       latitude = lat,
       longitude = lng,
       obs_dt,
