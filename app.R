@@ -66,50 +66,48 @@ locations <- locations %>%
 
 
 # Define the UI
+# Define the UI
 ui <- fluidPage(
   # set theme
   theme = bs_theme(bootswatch = "journal"),
+  
   # Add the logo at the top of the page
   tags$div(
     style = "display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;",
     tags$h1("Wildfire Burn Period Explorer"),
     tags$img(src = "UAlogo.jpg", height = "60px")  # Adjust the height as needed
   ),
-  # Footer with logo
-  tags$div(
-    style = "position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px; background-color: #f8f9fa;",
-    tags$img(src = "BP_app_logos.png", height = "70px") # Adjust src to point to your logo file and set the desired height
-  ),
-  # add css for spinnger
+  
+  # add css for spinner
   tags$head(tags$style(HTML(spinner_css))),  # Include the custom spinner CSS
-  # CSS to make the map take full width
-  #tags$style(type = "text/css", "#map {height: 700px;}"),
-  # set page title
-  # titlePanel("Wildfire Burn Period Plot Generator"),
   
   # Add tabs to the app
   tabsetPanel(
     id = "tabs",
+    
     # Tab 1: Map
     tabPanel("Map", 
              sidebarLayout(
                sidebarPanel(
-                 # selectizeInput("selected_location", 
-                 #                "Choose a location and then click Download Data:", 
-                 #                choices = locations$name,
-                 #                options = list(placeholder = 'Type or select a location')),
                  selectizeInput(
                    "selected_location", 
                    "Choose a location and then click Download Data:", 
                    choices = locations$name,
-                   selected = "SAGUARO",  # <-- Set your default station name here
+                   selected = "SAGUARO",
                    options = list(placeholder = 'Type or select a location')
                  ),
                  br(),
-                 actionButton("execute_btn", "Download Data"),  # <-- New: Add action button
+                 actionButton("execute_btn", "Download Data"),
                  br(),
                  br(),
-                 p("(Downloading large dataset: This will take several minutes.)")
+                 p("(Downloading large dataset: This will take several minutes.)"),
+                 
+                 # App Logos at the bottom of Map sidebar
+                 hr(),
+                 tags$div(
+                   style = "text-align: center; margin-top: 20px;",
+                   tags$img(src = "BP_app_logos.png", style = "max-width: 100%; height: auto;")
+                 )
                ),
                mainPanel(
                  leafletOutput("map", width = "100%", height = "500px")
@@ -123,30 +121,38 @@ ui <- fluidPage(
                sidebarPanel(
                  selectizeInput("selected_year", 
                                 "Choose a year:", 
-                                choices = seq(2005,as.numeric(format(Sys.Date(),"%Y")),1),
+                                choices = seq(2005, as.numeric(format(Sys.Date(),"%Y")), 1),
                                 options = list(placeholder = 'Type or select a year'),
                                 selected = as.numeric(format(Sys.Date(),"%Y"))),
                  br(),
-                 radioButtons( 
-                   inputId = "bpThreshold", 
-                   label = "Relative Humidity Threshold", 
-                   choices = list( 
-                     "10%" = 10, 
-                     "15%" = 15,
-                     "20%" = 20,
-                     "25%" = 25,
-                     "30%" = 30
-                   ),
-                   selected = 20
+                 sliderInput(
+                   inputId = "bpThreshold",
+                   label = "Relative Humidity Threshold",
+                   min = 10,
+                   max = 50,
+                   value = 20,
+                   step = 5,
+                   post = "%"
                  ),
+                 
+                 # App Logos at the bottom of Plots sidebar
+                 hr(),
+                 tags$div(
+                   style = "text-align: center; margin-top: 20px;",
+                   tags$img(src = "BP_app_logos.png", style = "max-width: 100%; height: auto;")
+                 )
                ),
                mainPanel(
                  plotlyOutput("plot"),
-                 p("Climatology represents daily smoothed mean (dark grey line) and range of values between 5th and 95th percentiles (light grey bars)."),
+                 helpText("Tracks daily burn hours (red line) against historical averages (dark grey line) and typical extremes (light grey band, 5th to 95th percentiles). Spikes above the grey band indicate days with longer than average burn periods."),
                  br(),
+                 
                  plotlyOutput("plot3"),
+                 helpText("Boxplots display the spread of burn hours by month and by year. The box contains the middle 50% of days, the line inside is the median, and the vertical lines (whiskers) show the full range. Use this to gauge the typical seasonality of burn period by month and variability over years."),
                  br(),
-                 plotlyOutput("plot2")
+                 
+                 plotlyOutput("plot2"),
+                 helpText("Shows the average daily humidity cycle for each month. The horizontal black line is your selected threshold; the time a month's curve spends below this line represents the typical daily burn period.")
                )
              )
     ),
@@ -179,6 +185,23 @@ ui <- fluidPage(
                       p("If you have questions or feedback, please contact Mike Crimmins (crimmins@arizona.edu)."),
                       h5("App Code"),
                       tags$a(href='https://github.com/Climate-Science-Applications-Program/Burn-Period-Explorer', 'https://github.com/Climate-Science-Applications-Program/Burn-Period-Explorer')
+               )
+             )
+    ),
+    
+    # Tab 4: Feedback
+    tabPanel("Feedback",
+             fluidRow(
+               column(12,
+                      tags$iframe(
+                        src = Sys.getenv("GOOGLE_FORM_URL"),
+                        width = "100%",
+                        height = "800px",
+                        frameborder = "0",
+                        marginheight = "0",
+                        marginwidth = "0",
+                        "Loading..."
+                      )
                )
              )
     )
